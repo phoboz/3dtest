@@ -25,11 +25,11 @@ typedef struct {
 } Vector3;
 
 typedef struct {
-  int x, y, z;
+  int32_t x, y, z;
 } Vector3i;
 
 typedef struct {
-  int x, y;
+  int32_t x, y;
 } Vector2i;
 
 typedef struct {
