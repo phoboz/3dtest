@@ -14,6 +14,7 @@
 #include <sound.h>
 
 #include "imath.h"
+#include "object.h"
 
 #define MAXX     FIXED_T(HALFW)
 #define MINX     -FIXED_T(HALFW)
@@ -25,48 +26,13 @@
 #define MOVE_SPEED FLOAT_TO_FIXED(0.3)
 
 #define SHADING FLTSHADING
-#define MAX_NODES 3
+#define NUM_POINTS 5
+#define NUM_FACES 6
 
 #define SIZE 4
 
-const Vector3 vlist1[MAX_NODES] = {
-  { FIXED_T(0), FIXED_T(SIZE), FIXED_T(0) },
-  { FIXED_T(SIZE), FIXED_T(-SIZE), FIXED_T(-SIZE) },
-  { FIXED_T(-SIZE), FIXED_T(-SIZE), FIXED_T(-SIZE) }
-};
-
-const Vector3 vlist2[MAX_NODES] = {
-  { FIXED_T(0), FIXED_T(SIZE), FIXED_T(0) },
-  { FIXED_T(-SIZE), FIXED_T(-SIZE), FIXED_T(SIZE) },
-  { FIXED_T(SIZE), FIXED_T(-SIZE), FIXED_T(SIZE) }
-};
-
-const Vector3 vlist3[MAX_NODES] = {
-  { FIXED_T(-SIZE), FIXED_T(-SIZE), FIXED_T(-SIZE) },
-  { FIXED_T(SIZE), FIXED_T(-SIZE), FIXED_T(-SIZE) },
-  { FIXED_T(-SIZE), FIXED_T(-SIZE), FIXED_T(SIZE) }
-};
-
-const Vector3 vlist4[MAX_NODES] = {
-  { FIXED_T(SIZE), FIXED_T(-SIZE), FIXED_T(-SIZE) },
-  { FIXED_T(SIZE), FIXED_T(-SIZE), FIXED_T(SIZE) },
-  { FIXED_T(-SIZE), FIXED_T(-SIZE), FIXED_T(SIZE) }
-};
-
-const Vector3 vlist5[MAX_NODES] = {
-  { FIXED_T(0), FIXED_T(SIZE), FIXED_T(0) },
-  { FIXED_T(-SIZE), FIXED_T(-SIZE), FIXED_T(-SIZE) },
-  { FIXED_T(-SIZE), FIXED_T(-SIZE), FIXED_T(SIZE) }
-};
-
-const Vector3 vlist6[MAX_NODES] = {
-  { FIXED_T(0), FIXED_T(SIZE), FIXED_T(0) },
-  { FIXED_T(SIZE), FIXED_T(-SIZE), FIXED_T(SIZE) },
-  { FIXED_T(SIZE), FIXED_T(-SIZE), FIXED_T(-SIZE) }
-};
-
-Vector3i trans_nodes[MAX_NODES];
-Vector2i proj_nodes[MAX_NODES];
+Object *obj;
+polygon *poly[NUM_FACES];
 
 fixed_t xpos;
 fixed_t ypos;
@@ -78,7 +44,6 @@ Matrix4 m_rot;
 Matrix4 m_trans;
 Matrix4 m_world;
 int light;
-polygon *poly1, *poly2, *poly3, *poly4, *poly5, *poly6;
 
 polygon *alloc_poly(nvertices) {
   size_t sz = sizeof(polygon) + nvertices * sizeof(vertex);
@@ -98,6 +63,8 @@ void update_poly(polygon *poly, Vector2i *points, unsigned int numPoints) {
 }
 
 void update(void) {
+  unsigned int i;
+
   if (++xangle > MAX_ANGLE) {
     xangle = 0;
   }
@@ -106,29 +73,19 @@ void update(void) {
   mTranslate(&m_trans, xpos, ypos, zpos);
   mMultiply(&m_world, &m_trans, &m_rot);
 
-  applyMatrix(trans_nodes, &m_world, vlist1, MAX_NODES);
-  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
-  update_poly(poly1, proj_nodes, MAX_NODES);
+  applyMatrix(obj->world_coords, &m_world, obj->obj_coords, obj->numPoints);
+  applyProjection(obj->proj_coords, obj->world_coords, obj->numPoints);
 
-  applyMatrix(trans_nodes, &m_world, vlist2, MAX_NODES);
-  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
-  update_poly(poly2, proj_nodes, MAX_NODES);
+  for (i = 0; i < obj->numFaces; i++) {
+    poly[i]->vertices[0].x = obj->proj_coords[obj->face_list[i].a].x << 16;
+    poly[i]->vertices[0].y = obj->proj_coords[obj->face_list[i].a].y << 16;
 
-  applyMatrix(trans_nodes, &m_world, vlist3, MAX_NODES);
-  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
-  update_poly(poly3, proj_nodes, MAX_NODES);
+    poly[i]->vertices[1].x = obj->proj_coords[obj->face_list[i].b].x << 16;
+    poly[i]->vertices[1].y = obj->proj_coords[obj->face_list[i].b].y << 16;
 
-  applyMatrix(trans_nodes, &m_world, vlist4, MAX_NODES);
-  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
-  update_poly(poly4, proj_nodes, MAX_NODES);
-
-  applyMatrix(trans_nodes, &m_world, vlist5, MAX_NODES);
-  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
-  update_poly(poly5, proj_nodes, MAX_NODES);
-
-  applyMatrix(trans_nodes, &m_world, vlist6, MAX_NODES);
-  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
-  update_poly(poly6, proj_nodes, MAX_NODES);
+    poly[i]->vertices[2].x = obj->proj_coords[obj->face_list[i].c].x << 16;
+    poly[i]->vertices[2].y = obj->proj_coords[obj->face_list[i].c].y << 16;
+  }
 }
 
 void init(void) {
@@ -141,65 +98,111 @@ void init(void) {
 
   light = 80 << 16;
 
-  poly1 = alloc_poly(MAX_NODES);
-  poly1->next = NULL;
-  poly1->flags = SHADING;
-  poly1->param = 0x88ff;
+  poly[0] = alloc_poly(3);
+  poly[0]->next = NULL;
+  poly[0]->flags = SHADING;
+  poly[0]->param = 0x88ff;
 
-  poly1->vertices[0].i = light + (128<<16);
-  poly1->vertices[1].i = light + (256<<16);
-  poly1->vertices[2].i = light;
+  poly[0]->vertices[0].i = light + (128<<16);
+  poly[0]->vertices[1].i = light + (256<<16);
+  poly[0]->vertices[2].i = light;
 
-  poly2 = alloc_poly(MAX_NODES);
-  poly2->next = poly1;
-  poly2->flags = SHADING;
-  poly2->param = 0x88ff;
+  poly[1] = alloc_poly(3);
+  poly[1]->next = poly[0];
+  poly[1]->flags = SHADING;
+  poly[1]->param = 0x88ff;
 
-  poly2->vertices[0].i = light + (128<<16);
-  poly2->vertices[1].i = light + (256<<16);
-  poly2->vertices[2].i = light;
+  poly[1]->vertices[0].i = light + (128<<16);
+  poly[1]->vertices[1].i = light + (256<<16);
+  poly[1]->vertices[2].i = light;
 
-  poly3 = alloc_poly(MAX_NODES);
-  poly3->next = poly2;
-  poly3->flags = SHADING;
-  poly3->param = 0x88ff;
+  poly[2] = alloc_poly(3);
+  poly[2]->next = poly[1];
+  poly[2]->flags = SHADING;
+  poly[2]->param = 0x88ff;
 
-  poly3->vertices[0].i = light + (128<<16);
-  poly3->vertices[1].i = light + (256<<16);
-  poly3->vertices[2].i = light;
+  poly[2]->vertices[0].i = light + (128<<16);
+  poly[2]->vertices[1].i = light + (256<<16);
+  poly[2]->vertices[2].i = light;
 
-  poly4 = alloc_poly(MAX_NODES);
-  poly4->next = poly3;
-  poly4->flags = SHADING;
-  poly4->param = 0x88ff;
+  poly[3] = alloc_poly(3);
+  poly[3]->next = poly[2];
+  poly[3]->flags = SHADING;
+  poly[3]->param = 0x88ff;
 
-  poly4->vertices[0].i = light + (128<<16);
-  poly4->vertices[1].i = light + (256<<16);
-  poly4->vertices[2].i = light;
+  poly[3]->vertices[0].i = light + (128<<16);
+  poly[3]->vertices[1].i = light + (256<<16);
+  poly[3]->vertices[2].i = light;
 
-  poly5 = alloc_poly(MAX_NODES);
-  poly5->next = poly4;
-  poly5->flags = SHADING;
-  poly5->param = 0x88ff;
+  poly[4] = alloc_poly(3);
+  poly[4]->next = poly[3];
+  poly[4]->flags = SHADING;
+  poly[4]->param = 0x88ff;
 
-  poly5->vertices[0].i = light + (128<<16);
-  poly5->vertices[1].i = light + (256<<16);
-  poly5->vertices[2].i = light;
+  poly[4]->vertices[0].i = light + (128<<16);
+  poly[4]->vertices[1].i = light + (256<<16);
+  poly[4]->vertices[2].i = light;
 
-  poly6 = alloc_poly(MAX_NODES);
-  poly6->next = poly5;
-  poly6->flags = SHADING;
-  poly6->param = 0x88ff;
+  poly[5] = alloc_poly(3);
+  poly[5]->next = poly[4];
+  poly[5]->flags = SHADING;
+  poly[5]->param = 0x88ff;
 
-  poly6->vertices[0].i = light + (128<<16);
-  poly6->vertices[1].i = light + (256<<16);
-  poly6->vertices[2].i = light;
+  poly[5]->vertices[0].i = light + (128<<16);
+  poly[5]->vertices[1].i = light + (256<<16);
+  poly[5]->vertices[2].i = light;
+
+  obj = new_object(NUM_POINTS, NUM_FACES);
+
+  obj->obj_coords[0].x = FIXED_T(0);
+  obj->obj_coords[0].y = FIXED_T(SIZE);
+  obj->obj_coords[0].z = FIXED_T(0);
+
+  obj->obj_coords[1].x = FIXED_T(SIZE);
+  obj->obj_coords[1].y = FIXED_T(-SIZE);
+  obj->obj_coords[1].z = FIXED_T(-SIZE);
+
+  obj->obj_coords[2].x = FIXED_T(-SIZE);
+  obj->obj_coords[2].y = FIXED_T(-SIZE);
+  obj->obj_coords[2].z = FIXED_T(-SIZE);
+
+  obj->obj_coords[3].x = FIXED_T(-SIZE);
+  obj->obj_coords[3].y = FIXED_T(-SIZE);
+  obj->obj_coords[3].z = FIXED_T(SIZE);
+
+  obj->obj_coords[4].x = FIXED_T(SIZE);
+  obj->obj_coords[4].y = FIXED_T(-SIZE);
+  obj->obj_coords[4].z = FIXED_T(SIZE);
+
+  obj->face_list[0].a = 0;
+  obj->face_list[0].b = 1;
+  obj->face_list[0].c = 2;
+
+  obj->face_list[1].a = 0;
+  obj->face_list[1].b = 3;
+  obj->face_list[1].c = 4;
+
+  obj->face_list[2].a = 2;
+  obj->face_list[2].b = 1;
+  obj->face_list[2].c = 3;
+
+  obj->face_list[3].a = 1;
+  obj->face_list[3].b = 4;
+  obj->face_list[3].c = 3;
+
+  obj->face_list[4].a = 0;
+  obj->face_list[4].b = 2;
+  obj->face_list[4].c = 3;
+
+  obj->face_list[5].a = 0;
+  obj->face_list[5].b = 4;
+  obj->face_list[5].c = 1;
 
   update();
 }
 
 void draw(screen *dst) {
-  render_polygon_list(dst, &poly6, CLR_SCREEN);
+  render_polygon_list(dst, poly[5], CLR_SCREEN);
 }
 
 int main(int argc, char *argv[]) {

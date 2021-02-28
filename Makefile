@@ -1,7 +1,7 @@
 include	Makefile.config
 
 PROJECT=reargunner2k
-SRCC=main.c imath.c tritab.c
+SRCC=main.c imath.c tritab.c object.c
 SRCS=
 SRCH=
 OBJS=$(SRCC:.c=.o) $(SRCS:.s=.o) 
