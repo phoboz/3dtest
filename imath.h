@@ -29,6 +29,10 @@ typedef struct {
 } Vector3i;
 
 typedef struct {
+  int x, y;
+} Vector2i;
+
+typedef struct {
   fixed_t m[4][4];
 } Matrix4;
 
@@ -51,7 +55,7 @@ void mRotateZ(Matrix4 *mat, const unsigned int angle);
 void mTranslate(Matrix4 *mat, const fixed_t x, const fixed_t y, const fixed_t z);
 void mScale(Matrix4 *mat, const float ratio);
 void applyMatrix(Vector3i *result, const Matrix4 *mat, const Vector3 *points, const unsigned int numPoints);
-void applyProjection(vertex *proj, const Vector3i *points, const unsigned int numPoints);
+void applyProjection(Vector2i *proj, const Vector3i *points, const unsigned int numPoints);
 
 #endif
 

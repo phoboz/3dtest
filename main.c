@@ -66,6 +66,7 @@ const Vector3 vlist6[MAX_NODES] = {
 };
 
 Vector3i trans_nodes[MAX_NODES];
+Vector2i proj_nodes[MAX_NODES];
 
 fixed_t xpos;
 fixed_t ypos;
@@ -87,6 +88,15 @@ polygon *alloc_poly(nvertices) {
   return result;
 }
 
+void update_poly(polygon *poly, Vector2i *points, unsigned int numPoints) {
+  unsigned int i;
+
+  for (i = 0; i < numPoints; i++) {
+    poly->vertices[i].x = points[i].x << 16;
+    poly->vertices[i].y = points[i].y << 16;
+  }
+}
+
 void update(void) {
   if (++xangle > MAX_ANGLE) {
     xangle = 0;
@@ -97,22 +107,28 @@ void update(void) {
   mMultiply(&m_world, &m_trans, &m_rot);
 
   applyMatrix(trans_nodes, &m_world, vlist1, MAX_NODES);
-  applyProjection(&poly1->vertices, trans_nodes, MAX_NODES);
+  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
+  update_poly(poly1, proj_nodes, MAX_NODES);
 
   applyMatrix(trans_nodes, &m_world, vlist2, MAX_NODES);
-  applyProjection(&poly2->vertices, trans_nodes, MAX_NODES);
+  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
+  update_poly(poly2, proj_nodes, MAX_NODES);
 
   applyMatrix(trans_nodes, &m_world, vlist3, MAX_NODES);
-  applyProjection(&poly3->vertices, trans_nodes, MAX_NODES);
+  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
+  update_poly(poly3, proj_nodes, MAX_NODES);
 
   applyMatrix(trans_nodes, &m_world, vlist4, MAX_NODES);
-  applyProjection(&poly4->vertices, trans_nodes, MAX_NODES);
+  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
+  update_poly(poly4, proj_nodes, MAX_NODES);
 
   applyMatrix(trans_nodes, &m_world, vlist5, MAX_NODES);
-  applyProjection(&poly5->vertices, trans_nodes, MAX_NODES);
+  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
+  update_poly(poly5, proj_nodes, MAX_NODES);
 
   applyMatrix(trans_nodes, &m_world, vlist6, MAX_NODES);
-  applyProjection(&poly6->vertices, trans_nodes, MAX_NODES);
+  applyProjection(proj_nodes, trans_nodes, MAX_NODES);
+  update_poly(poly6, proj_nodes, MAX_NODES);
 }
 
 void init(void) {

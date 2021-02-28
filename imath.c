@@ -109,15 +109,12 @@ void applyMatrix(Vector3i *result, const Matrix4 *mat, const Vector3 *points, co
   }
 }
 
-void applyProjection(vertex *proj, const Vector3i *points, const unsigned int numPoints) {
+void applyProjection(Vector2i *proj, const Vector3i *points, const unsigned int numPoints) {
   unsigned int index;
 
   for (index = 0; index < numPoints; index++) {
     proj[index].x = (FOV * points[index].x) / (FOV + points[index].z) + HALFW;
     proj[index].y = -(FOV * points[index].y) / (FOV + points[index].z) + HALFH;
-
-    proj[index].x <<= 16;
-    proj[index].y <<= 16;
   }
 }
 
