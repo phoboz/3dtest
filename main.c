@@ -52,7 +52,6 @@ int zangle;
 Matrix4 m_rot;
 Matrix4 m_trans;
 Matrix4 m_world;
-int light;
 
 polygon *alloc_poly(nvertices) {
   size_t sz = sizeof(polygon) + nvertices * sizeof(vertex);
@@ -118,55 +117,29 @@ void init(void) {
   yangle = 0;
   zangle = 0;
 
-  light = 80 << 16;
-
   poly[0] = alloc_poly(3);
   poly[0]->next = NULL;
   poly[0]->flags = SHADING;
-
-  poly[0]->vertices[0].i = light + (128<<16);
-  poly[0]->vertices[1].i = light + (256<<16);
-  poly[0]->vertices[2].i = light;
 
   poly[1] = alloc_poly(3);
   poly[1]->next = poly[0];
   poly[1]->flags = SHADING;
 
-  poly[1]->vertices[0].i = light + (128<<16);
-  poly[1]->vertices[1].i = light + (256<<16);
-  poly[1]->vertices[2].i = light;
-
   poly[2] = alloc_poly(3);
   poly[2]->next = poly[1];
   poly[2]->flags = SHADING;
-
-  poly[2]->vertices[0].i = light + (128<<16);
-  poly[2]->vertices[1].i = light + (256<<16);
-  poly[2]->vertices[2].i = light;
 
   poly[3] = alloc_poly(3);
   poly[3]->next = poly[2];
   poly[3]->flags = SHADING;
 
-  poly[3]->vertices[0].i = light + (128<<16);
-  poly[3]->vertices[1].i = light + (256<<16);
-  poly[3]->vertices[2].i = light;
-
   poly[4] = alloc_poly(3);
   poly[4]->next = poly[3];
   poly[4]->flags = SHADING;
 
-  poly[4]->vertices[0].i = light + (128<<16);
-  poly[4]->vertices[1].i = light + (256<<16);
-  poly[4]->vertices[2].i = light;
-
   poly[5] = alloc_poly(3);
   poly[5]->next = poly[4];
   poly[5]->flags = SHADING;
-
-  poly[5]->vertices[0].i = light + (128<<16);
-  poly[5]->vertices[1].i = light + (256<<16);
-  poly[5]->vertices[2].i = light;
 
   obj = new_object(NUM_POINTS, NUM_FACES);
 
@@ -247,10 +220,6 @@ void init(void) {
   update();
 }
 
-void draw(screen *dst) {
-  render_polygon_list(dst, poly[5], CLR_SCREEN);
-}
-
 int main(int argc, char *argv[]) {
   joypad_state *j_state = malloc(sizeof(joypad_state));
 
@@ -288,7 +257,7 @@ int main(int argc, char *argv[]) {
   init();
   for(;;) {
     vsync();
-    draw(phys);
+    render_polygon_list(phys, poly[5], CLR_SCREEN);
     update();
     read_joypad_state(j_state);
     wait_renderer_completion();
