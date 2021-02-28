@@ -61,15 +61,6 @@ polygon *alloc_poly(nvertices) {
   return result;
 }
 
-void update_poly(polygon *poly, Vector2i *points, unsigned int numPoints) {
-  unsigned int i;
-
-  for (i = 0; i < numPoints; i++) {
-    poly->vertices[i].x = points[i].x << 16;
-    poly->vertices[i].y = points[i].y << 16;
-  }
-}
-
 void update(void) {
   unsigned int i;
 
