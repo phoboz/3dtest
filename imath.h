@@ -18,18 +18,18 @@
 #include <stdint.h>
 #include <render.h>
 
-typedef int32_t fixed_t;
+typedef int16_t fixed_t;
 
 typedef struct {
   fixed_t x, y, z;
 } Vector3;
 
 typedef struct {
-  int32_t x, y, z;
+  int16_t x, y, z;
 } Vector3i;
 
 typedef struct {
-  int32_t x, y;
+  int16_t x, y;
 } Vector2i;
 
 typedef struct {
@@ -44,6 +44,10 @@ extern fixed_t costab[MAX_ANGLE + 1];
 
 #define SIN(a) sintab[(a)]
 #define COS(a) costab[(a)]
+
+__inline__ static fixed_t fixed_mul(fixed_t x, fixed_t y) {
+  return ((x *  y) + PROUNDBIT) >> PSHIFT;
+}
 
 void init_imath(void);
 

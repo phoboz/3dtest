@@ -95,17 +95,17 @@ void applyMatrix(Vector3i *result, const Matrix4 *mat, const Vector3 *points, co
     result[index].x = (mat->m[0][0] * (points[index].x >> PSHIFT) +
                        mat->m[1][0] * (points[index].y >> PSHIFT) +
                        mat->m[2][0] * (points[index].z >> PSHIFT) +
-                       mat->m[3][0]) >> PSHIFT;
+                       mat->m[3][0]) / PRES;
       
     result[index].y = (mat->m[0][1] * (points[index].x >> PSHIFT) +
                        mat->m[1][1] * (points[index].y >> PSHIFT) +
                        mat->m[2][1] * (points[index].z >> PSHIFT) +
-                       mat->m[3][1]) >> PSHIFT;
+                       mat->m[3][1]) / PRES;
 
     result[index].z = (mat->m[0][2] * (points[index].x >> PSHIFT) +
                        mat->m[1][2] * (points[index].y >> PSHIFT) +
                        mat->m[2][2] * (points[index].z >> PSHIFT) +
-                       mat->m[3][2]) >> PSHIFT;
+                       mat->m[3][2]) / PRES;
   }
 }
 

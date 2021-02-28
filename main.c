@@ -17,11 +17,11 @@
 #include "object.h"
 
 #define MAXX     FIXED_T(HALFW)
-#define MINX     -FIXED_T(HALFW)
+#define MINX     FIXED_T(-HALFW)
 #define MAXY     FIXED_T(HALFH)
-#define MINY     -FIXED_T(HALFH)
-#define MINZ     -FIXED_T(120)
-#define MAXZ     FIXED_T(120)
+#define MINY     FIXED_T(-HALFH)
+#define MINZ     FIXED_T(-120)
+#define MAXZ     FIXED_T(256)
 
 #define MOVE_SPEED FLOAT_TO_FIXED(0.3)
 
@@ -91,7 +91,7 @@ void update(void) {
 void init(void) {
   xpos = FIXED_T(0);
   ypos = FIXED_T(0);
-  zpos = FIXED_T(12);
+  zpos = FIXED_T(0);
   xangle = 0;
   yangle = 0;
   zangle = 0;
