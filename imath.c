@@ -74,11 +74,11 @@ void mRotateZ(Matrix4 *mat, const unsigned int angle) {
   mat->m[1][1] =  COS(angle);
 }
 
-void mTranslate(Matrix4 *mat, const int x, const int y, const int z) {
+void mTranslate(Matrix4 *mat, const fixed_t x, const fixed_t y, const fixed_t z) {
   mIdentity(mat);
-  mat->m[3][0] =  x << PSHIFT;
-  mat->m[3][1] =  y << PSHIFT;
-  mat->m[3][2] =  z << PSHIFT;
+  mat->m[3][0] =  x;
+  mat->m[3][1] =  y;
+  mat->m[3][2] =  z;
 }
 
 void mScale(Matrix4 *mat, const float ratio) {

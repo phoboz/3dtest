@@ -15,8 +15,14 @@
 
 #include "imath.h"
 
-#define MINZ     -120
-#define MAXZ     120
+#define MAXX     FIXED_T(HALFW)
+#define MINX     -FIXED_T(HALFW)
+#define MAXY     FIXED_T(HALFH)
+#define MINY     -FIXED_T(HALFH)
+#define MINZ     -FIXED_T(120)
+#define MAXZ     FIXED_T(120)
+
+#define MOVE_SPEED FLOAT_TO_FIXED(0.3)
 
 #define SHADING FLTSHADING
 #define MAX_NODES 3
@@ -61,9 +67,9 @@ const Vector3 vlist6[MAX_NODES] = {
 
 Vector3i trans_nodes[MAX_NODES];
 
-int xpos;
-int ypos;
-int zpos;
+fixed_t xpos;
+fixed_t ypos;
+fixed_t zpos;
 int xangle;
 int yangle;
 int zangle;
@@ -110,9 +116,9 @@ void update(void) {
 }
 
 void init(void) {
-  xpos = 0;
-  ypos = 0;
-  zpos = MAXZ;
+  xpos = FIXED_T(0);
+  ypos = FIXED_T(0);
+  zpos = FIXED_T(12);
   xangle = 0;
   yangle = 0;
   zangle = 0;
@@ -231,29 +237,35 @@ int main(int argc, char *argv[]) {
     frame_sprite->data = phys->data;
 
     if(j_state->j1 & JOYPAD_RIGHT) {
-      if (++xpos > HALFW) {
-        xpos = HALFW;
+      xpos += MOVE_SPEED;
+      if (xpos > MAXX) {
+        xpos = MAXX;
       }
     } else if(j_state->j1 & JOYPAD_LEFT) {
-      if (--xpos < -HALFW) {
-        xpos = -HALFW;
+      xpos -= MOVE_SPEED;
+      if (xpos < MINX) {
+        xpos = MINX;
       }
     }
     if(j_state->j1 & JOYPAD_UP) {
-      if (++ypos > HALFH) {
-        ypos = HALFH;
+      ypos += MOVE_SPEED;
+      if (ypos > MAXY) {
+        ypos = MAXY;
       }
     } else if(j_state->j1 & JOYPAD_DOWN) {
-      if (--ypos < -HALFH) {
-        ypos = -HALFH;
+      ypos -= MOVE_SPEED;
+      if (ypos < MINY) {
+        ypos = MINY;
       }
     }
     if(j_state->j1 & JOYPAD_C) {
-      if (++zpos > MAXZ) {
+      zpos += MOVE_SPEED;
+      if (zpos > MAXZ) {
         zpos = MAXZ;
       }
     } else if(j_state->j1 & JOYPAD_A) {
-      if (--zpos < MINZ) {
+      zpos -= MOVE_SPEED;
+      if (zpos < MINZ) {
         zpos = MINZ;
       }
     }

@@ -36,6 +36,7 @@ extern fixed_t sintab[MAX_ANGLE + 1];
 extern fixed_t costab[MAX_ANGLE + 1];
 
 #define FIXED_T(x) (x << PSHIFT)
+#define FLOAT_TO_FIXED(f) ((f) * PRES)
 
 #define SIN(a) sintab[(a)]
 #define COS(a) costab[(a)]
@@ -47,7 +48,7 @@ void mMultiply(Matrix4 *mat, const Matrix4 *mat1, const Matrix4 *mat2);
 void mRotateX(Matrix4 *mat, const unsigned int angle);
 void mRotateY(Matrix4 *mat, const unsigned int angle);
 void mRotateZ(Matrix4 *mat, const unsigned int angle);
-void mTranslate(Matrix4 *mat, const int x, const int y, const int z);
+void mTranslate(Matrix4 *mat, const fixed_t x, const fixed_t y, const fixed_t z);
 void mScale(Matrix4 *mat, const float ratio);
 void applyMatrix(Vector3i *result, const Matrix4 *mat, const Vector3 *points, const unsigned int numPoints);
 void applyProjection(vertex *proj, const Vector3i *points, const unsigned int numPoints);
