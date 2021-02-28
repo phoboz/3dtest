@@ -18,18 +18,19 @@
 #include <stdint.h>
 #include <render.h>
 
-typedef int16_t fixed_t;
+typedef int32_t int_t;
+typedef int32_t fixed_t;
 
 typedef struct {
   fixed_t x, y, z;
 } Vector3;
 
 typedef struct {
-  int16_t x, y, z;
+  int_t x, y, z;
 } Vector3i;
 
 typedef struct {
-  int16_t x, y;
+  int_t x, y;
 } Vector2i;
 
 typedef struct {

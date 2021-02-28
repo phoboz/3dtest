@@ -26,10 +26,12 @@
 #define MOVE_SPEED FLOAT_TO_FIXED(0.3)
 
 #define SHADING FLTSHADING
+#define FACE_COLOR CRYCOLOR(0x8, 0xf, 0xff)
+
 #define NUM_POINTS 5
 #define NUM_FACES 6
 
-#define SIZE 4
+#define SIZE 32
 
 Object *obj;
 polygon *poly[NUM_FACES];
@@ -85,6 +87,9 @@ void update(void) {
 
     poly[i]->vertices[2].x = obj->proj_coords[obj->face_list[i].c].x << 16;
     poly[i]->vertices[2].y = obj->proj_coords[obj->face_list[i].c].y << 16;
+
+    //poly[i]->param = CRYCOLOR(obj->face_list[i].col_c, obj->face_list[i].col_r, obj->face_list[i].intensity);
+    poly[i]->param = (obj->face_list[i].color << 8) | obj->face_list[i].intensity;
   }
 }
 
@@ -101,7 +106,7 @@ void init(void) {
   poly[0] = alloc_poly(3);
   poly[0]->next = NULL;
   poly[0]->flags = SHADING;
-  poly[0]->param = 0x88ff;
+  poly[0]->param = FACE_COLOR;
 
   poly[0]->vertices[0].i = light + (128<<16);
   poly[0]->vertices[1].i = light + (256<<16);
@@ -110,7 +115,7 @@ void init(void) {
   poly[1] = alloc_poly(3);
   poly[1]->next = poly[0];
   poly[1]->flags = SHADING;
-  poly[1]->param = 0x88ff;
+  poly[1]->param = FACE_COLOR;
 
   poly[1]->vertices[0].i = light + (128<<16);
   poly[1]->vertices[1].i = light + (256<<16);
@@ -119,7 +124,7 @@ void init(void) {
   poly[2] = alloc_poly(3);
   poly[2]->next = poly[1];
   poly[2]->flags = SHADING;
-  poly[2]->param = 0x88ff;
+  poly[2]->param = FACE_COLOR;
 
   poly[2]->vertices[0].i = light + (128<<16);
   poly[2]->vertices[1].i = light + (256<<16);
@@ -128,7 +133,7 @@ void init(void) {
   poly[3] = alloc_poly(3);
   poly[3]->next = poly[2];
   poly[3]->flags = SHADING;
-  poly[3]->param = 0x88ff;
+  poly[3]->param = FACE_COLOR;
 
   poly[3]->vertices[0].i = light + (128<<16);
   poly[3]->vertices[1].i = light + (256<<16);
@@ -137,7 +142,7 @@ void init(void) {
   poly[4] = alloc_poly(3);
   poly[4]->next = poly[3];
   poly[4]->flags = SHADING;
-  poly[4]->param = 0x88ff;
+  poly[4]->param = FACE_COLOR;
 
   poly[4]->vertices[0].i = light + (128<<16);
   poly[4]->vertices[1].i = light + (256<<16);
@@ -146,7 +151,7 @@ void init(void) {
   poly[5] = alloc_poly(3);
   poly[5]->next = poly[4];
   poly[5]->flags = SHADING;
-  poly[5]->param = 0x88ff;
+  poly[5]->param = FACE_COLOR;
 
   poly[5]->vertices[0].i = light + (128<<16);
   poly[5]->vertices[1].i = light + (256<<16);
@@ -177,26 +182,38 @@ void init(void) {
   obj->face_list[0].a = 0;
   obj->face_list[0].b = 1;
   obj->face_list[0].c = 2;
+  obj->face_list[0].color = 0xf0;
+  obj->face_list[0].intensity = 0xff;
 
   obj->face_list[1].a = 0;
   obj->face_list[1].b = 3;
   obj->face_list[1].c = 4;
+  obj->face_list[1].color = 0xf0;
+  obj->face_list[1].intensity = 0xff;
 
   obj->face_list[2].a = 2;
   obj->face_list[2].b = 1;
   obj->face_list[2].c = 3;
+  obj->face_list[2].color = 0x00;
+  obj->face_list[2].intensity = 0xff;
 
   obj->face_list[3].a = 1;
   obj->face_list[3].b = 4;
   obj->face_list[3].c = 3;
+  obj->face_list[3].color = 0x00;
+  obj->face_list[3].intensity = 0xff;
 
   obj->face_list[4].a = 0;
   obj->face_list[4].b = 2;
   obj->face_list[4].c = 3;
+  obj->face_list[4].color = 0x00;
+  obj->face_list[4].intensity = 0xff;
 
   obj->face_list[5].a = 0;
   obj->face_list[5].b = 4;
   obj->face_list[5].c = 1;
+  obj->face_list[5].color = 0x00;
+  obj->face_list[5].intensity = 0xff;
 
   update();
 }

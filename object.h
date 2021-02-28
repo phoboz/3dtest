@@ -5,6 +5,9 @@
 
 typedef struct {
   unsigned int a, b, c;
+
+  uint8_t color;
+  uint8_t intensity;
 } Triangle;
 
 typedef struct {

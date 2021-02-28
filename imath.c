@@ -113,8 +113,16 @@ void applyProjection(Vector2i *proj, const Vector3i *points, const unsigned int 
   unsigned int index;
 
   for (index = 0; index < numPoints; index++) {
-    proj[index].x = (FOV * points[index].x) / (FOV + points[index].z) + HALFW;
-    proj[index].y = -(FOV * points[index].y) / (FOV + points[index].z) + HALFH;
+    int_t div = FOV + points[index].z;
+
+    if (div != 0) {
+      proj[index].x = (FOV * points[index].x) / (FOV + points[index].z) + HALFW;
+      proj[index].y = -(FOV * points[index].y) / (FOV + points[index].z) + HALFH;
+    }
+    else {
+      proj[index].x = (FOV * points[index].x) / PRES + HALFW;
+      proj[index].y = -(FOV * points[index].y) / PRES + HALFH;
+    }
   }
 }
 
