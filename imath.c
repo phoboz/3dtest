@@ -13,9 +13,18 @@ void init_imath(void) {
   memcpy(costab, costab_def, sizeof(costab_def));
 }
 
-// fixed point multiplication
-static fixed_t pMultiply(fixed_t x, fixed_t y) {
-  return ( (x * y) + PROUNDBIT) >> PSHIFT;
+fixed_t dotProduct(const Vector3 *a, const Vector3 *b) {
+  fixed_t result = pMultiply(a->x, b->x) +
+                   pMultiply(a->y, b->y) +
+                   pMultiply(a->z, b->z);
+
+  return result;
+}
+
+void crossProduct(Vector3 *result, const Vector3 *a, const Vector3 *b) {
+  result->x = pMultiply(a->y, b->z) - pMultiply(b->y,a->z);
+  result->y = pMultiply(b->x, a->z) - pMultiply(a->x, b->z);
+  result->z = pMultiply(a->x, b->y) - pMultiply(b->x, a->y);
 }
 
 void mIdentity(Matrix4 *mat) {
@@ -86,6 +95,20 @@ void mScale(Matrix4 *mat, const float ratio) {
   mat->m[0][0] *= ratio;
   mat->m[1][1] *= ratio;
   mat->m[2][2] *= ratio;
+}
+
+void multiplyMatrixVector3(Vector3 *result, const Matrix4 *mat, const Vector3 *a) {
+  result->x = pMultiply(mat->m[0][0], a->x) +
+              pMultiply(mat->m[1][0], a->y) +
+              pMultiply(mat->m[2][0], a->z);
+
+  result->y = pMultiply(mat->m[0][1], a->x) +
+              pMultiply(mat->m[1][1], a->y) +
+              pMultiply(mat->m[2][1], a->z);
+
+  result->z = pMultiply(mat->m[0][2], a->x) +
+              pMultiply(mat->m[1][2], a->y) +
+              pMultiply(mat->m[2][2], a->z);
 }
 
 void applyMatrix(Vector3i *result, const Matrix4 *mat, const Vector3 *points, const unsigned int numPoints) {

@@ -5,6 +5,7 @@
 
 typedef struct {
   unsigned int a, b, c;
+  Vector3 normal;
 
   uint8_t color;
   uint8_t intensity;

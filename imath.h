@@ -46,11 +46,15 @@ extern fixed_t costab[MAX_ANGLE + 1];
 #define SIN(a) sintab[(a)]
 #define COS(a) costab[(a)]
 
-__inline__ static fixed_t fixed_mul(fixed_t x, fixed_t y) {
-  return ((x *  y) + PROUNDBIT) >> PSHIFT;
+void init_imath(void);
+
+// fixed point multiplication
+static fixed_t pMultiply(fixed_t x, fixed_t y) {
+  return ( (x * y) + PROUNDBIT) >> PSHIFT;
 }
 
-void init_imath(void);
+fixed_t dotProduct(const Vector3 *a, const Vector3 *b);
+void crossProduct(Vector3 *result, const Vector3 *a, const Vector3 *b);
 
 void mIdentity(Matrix4 *mat);
 void mMultiply(Matrix4 *mat, const Matrix4 *mat1, const Matrix4 *mat2);
@@ -59,6 +63,9 @@ void mRotateY(Matrix4 *mat, const unsigned int angle);
 void mRotateZ(Matrix4 *mat, const unsigned int angle);
 void mTranslate(Matrix4 *mat, const fixed_t x, const fixed_t y, const fixed_t z);
 void mScale(Matrix4 *mat, const float ratio);
+
+void multiplyMatrixVector3(Vector3 *result, const Matrix4 *mat, const Vector3 *a);
+
 void applyMatrix(Vector3i *result, const Matrix4 *mat, const Vector3 *points, const unsigned int numPoints);
 void applyProjection(Vector2i *proj, const Vector3i *points, const unsigned int numPoints);
 
