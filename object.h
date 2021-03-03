@@ -1,7 +1,10 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
+#include <render.h>
 #include "imath.h"
+
+#define OBJECT_SHADING FLTSHADING
 
 typedef struct {
   unsigned int a, b, c;
@@ -20,9 +23,13 @@ typedef struct {
 
   unsigned int numFaces;
   Triangle *face_list;
+  polygon **ply_list;
+
+  polygon *render_list;
 } Object;
 
 Object* new_object(unsigned int numPoints, unsigned int nunFaces);
+void update_object(Object *obj, Matrix4 *mat, Vector3 *light_p, fixed_t light_amb);
 
 #endif
 
