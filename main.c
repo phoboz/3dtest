@@ -156,10 +156,12 @@ int main(int argc, char *argv[]) {
       if ((lock_keys & JOYPAD_1) == 0) {
         if (sort_mode == MODE_NO_SORT) {
           set_object_flags(obj[0], FLTSHADING | ZBUFFERING);
+          set_object_flags(obj[1], FLTSHADING | ZBUFFERING);
           sort_mode = MODE_Z_BUFFER;
         }
         else if (sort_mode == MODE_Z_BUFFER) {
           set_object_flags(obj[0], FLTSHADING);
+          set_object_flags(obj[1], FLTSHADING);
           sort_mode = MODE_NO_SORT;
         }
         lock_keys |= JOYPAD_1;
