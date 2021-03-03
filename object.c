@@ -17,7 +17,7 @@ static polygon* new_triangle(polygon *next) {
   return result;
 }
 
-Object* new_object(unsigned int numPoints, unsigned int numFaces) {
+Object* new_object(const unsigned int numPoints, const unsigned int numFaces) {
   Object *obj = (Object *) malloc(sizeof(Object));
 
   obj->numPoints = numPoints;
@@ -30,7 +30,7 @@ Object* new_object(unsigned int numPoints, unsigned int numFaces) {
   obj->face_list = (Triangle *) malloc(numFaces * sizeof(Triangle));
   obj->ply_list = (polygon **) malloc(numFaces * sizeof(polygon*));
 
-  int i;
+  unsigned int i;
   polygon *last_ply = NULL;
   for (i = 0; i < numFaces; i++) {
     last_ply = new_triangle(last_ply);
@@ -42,11 +42,23 @@ Object* new_object(unsigned int numPoints, unsigned int numFaces) {
   return obj;
 }
 
-void update_object(Object *obj, Matrix4 *mat, Vector3 *light_p, fixed_t light_amb) {
+void connect_to_object(Object *obj1, const Object *obj2) {
+  obj1->ply_list[0]->next = obj2->render_list;
+}
+
+void set_object_flags(Object *obj, const short int flags) {
+  unsigned int i;
+
+  for (i = 0; i < obj->numFaces; i++) {
+    obj->ply_list[i]->flags = flags;
+  }
+}
+
+void update_object(Object *obj, Matrix4 *mat, const Vector3 *light_p, const fixed_t light_amb) {
   applyMatrix(obj->world_coords, mat, obj->obj_coords, obj->numPoints);
   applyProjection(obj->proj_coords, obj->world_coords, obj->numPoints);
 
-  int i;
+  unsigned int i;
   for (i = 0; i < obj->numFaces; i++) {
     Vector3 normal;
 
@@ -59,12 +71,15 @@ void update_object(Object *obj, Matrix4 *mat, Vector3 *light_p, fixed_t light_am
 
     obj->ply_list[i]->vertices[0].x = obj->proj_coords[obj->face_list[i].a].x << 16;
     obj->ply_list[i]->vertices[0].y = obj->proj_coords[obj->face_list[i].a].y << 16;
+    obj->ply_list[i]->vertices[0].z = obj->world_coords[obj->face_list[i].a].z << 16;
 
     obj->ply_list[i]->vertices[1].x = obj->proj_coords[obj->face_list[i].b].x << 16;
     obj->ply_list[i]->vertices[1].y = obj->proj_coords[obj->face_list[i].b].y << 16;
+    obj->ply_list[i]->vertices[1].z = obj->world_coords[obj->face_list[i].b].z << 16;
 
     obj->ply_list[i]->vertices[2].x = obj->proj_coords[obj->face_list[i].c].x << 16;
     obj->ply_list[i]->vertices[2].y = obj->proj_coords[obj->face_list[i].c].y << 16;
+    obj->ply_list[i]->vertices[2].z = obj->world_coords[obj->face_list[i].c].z << 16;
 
     obj->ply_list[i]->param = (obj->face_list[i].color << 8) | (intensity >> PSHIFT)
 ; 

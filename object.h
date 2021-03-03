@@ -28,8 +28,10 @@ typedef struct {
   polygon *render_list;
 } Object;
 
-Object* new_object(unsigned int numPoints, unsigned int nunFaces);
-void update_object(Object *obj, Matrix4 *mat, Vector3 *light_p, fixed_t light_amb);
+Object* new_object(const unsigned int numPoints, const unsigned int nunFaces);
+void connect_to_object(Object *obj1, const Object *obj2);
+void set_object_flags(Object *obj, const short int flags);
+void update_object(Object *obj, Matrix4 *mat, const Vector3 *light_p, const fixed_t light_amb);
 
 #endif
 

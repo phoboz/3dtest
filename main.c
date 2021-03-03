@@ -17,6 +17,13 @@
 #include "object.h"
 #include "pyramid.h"
 
+#define ROOT_OBJECT 0
+#define OBJECT_SIZE  FLOAT_TO_FIXED(32.0)
+
+#define AMBIENT_LIGHT FIXED_T(72)
+#define FACE_COLOR_1 0x00
+#define FACE_COLOR_2 0xf0
+
 #define MAXX     FIXED_T(HALFW)
 #define MINX     FIXED_T(-HALFW)
 #define MAXY     FIXED_T(HALFH)
@@ -26,18 +33,16 @@
 
 #define MOVE_SPEED FLOAT_TO_FIXED(0.3)
 
-#define AMBIENT_LIGHT FIXED_T(72)
-#define FACE_COLOR_1 0x00
-#define FACE_COLOR_2 0xf0
-
-#define SIZE 32
+#define MODE_NO_SORT     0
+#define MODE_Z_BUFFER    1
 
 const Vector3 light_source = {
   FLOAT_TO_FIXED(-0.577), FLOAT_TO_FIXED(0.577), FLOAT_TO_FIXED(-0.577)
 };
 
-Object *obj;
+Object *obj[2];
 
+unsigned int lock_keys;
 fixed_t xpos;
 fixed_t ypos;
 fixed_t zpos;
@@ -48,16 +53,24 @@ Matrix4 m_rot;
 Matrix4 m_trans;
 Matrix4 m_world;
 
+int sort_mode;
+
 void update(void) {
   if (++xangle > MAX_ANGLE) {
     xangle = 0;
   }
 
   mRotateX(&m_rot, xangle);
-  mTranslate(&m_trans, xpos, ypos, zpos);
+  mTranslate(&m_trans, xpos + OBJECT_SIZE, ypos, zpos);
   mMultiply(&m_world, &m_trans, &m_rot);
 
-  update_object(obj, &m_world, &light_source, AMBIENT_LIGHT);
+  update_object(obj[0], &m_world, &light_source, AMBIENT_LIGHT);
+
+  mRotateX(&m_rot, xangle);
+  mTranslate(&m_trans, xpos - OBJECT_SIZE, ypos, zpos);
+  mMultiply(&m_world, &m_trans, &m_rot);
+
+  update_object(obj[1], &m_world, &light_source, AMBIENT_LIGHT);
 }
 
 void init(void) {
@@ -68,9 +81,9 @@ void init(void) {
   yangle = 0;
   zangle = 0;
 
-  obj = new_pyramid(FIXED_T(SIZE), FACE_COLOR_1);
-  obj->face_list[0].color = FACE_COLOR_2;
-  obj->face_list[1].color = FACE_COLOR_2;
+  obj[0] = new_pyramid(OBJECT_SIZE, FACE_COLOR_1);
+  obj[1] = new_pyramid(OBJECT_SIZE, FACE_COLOR_2);
+  connect_to_object(obj[ROOT_OBJECT], obj[1]);
 
   update();
 }
@@ -110,9 +123,17 @@ int main(int argc, char *argv[]) {
 
   init_imath();
   init();
+  lock_keys = 0;
+  sort_mode = MODE_NO_SORT;
+
   for(;;) {
     vsync();
-    render_polygon_list(phys, obj->render_list, CLR_SCREEN);
+    if (sort_mode == MODE_NO_SORT) {
+      render_polygon_list(phys, obj[ROOT_OBJECT]->render_list, CLR_SCREEN);
+    }
+    else if (sort_mode == MODE_Z_BUFFER) {
+      render_polygon_list(phys, obj[ROOT_OBJECT]->render_list, CLR_SCREEN | CLR_Z_SCREEN);
+    }
     update();
     read_joypad_state(j_state);
     wait_renderer_completion();
@@ -124,6 +145,26 @@ int main(int argc, char *argv[]) {
     wait_display_refresh();
 
     frame_sprite->data = phys->data;
+
+    if (lock_keys) {
+      if ((j_state->j1 & JOYPAD_1) == 0) {
+        lock_keys &= ~JOYPAD_1;
+      }
+    }
+
+    if (j_state->j1 & JOYPAD_1) {
+      if ((lock_keys & JOYPAD_1) == 0) {
+        if (sort_mode == MODE_NO_SORT) {
+          set_object_flags(obj[0], FLTSHADING | ZBUFFERING);
+          sort_mode = MODE_Z_BUFFER;
+        }
+        else if (sort_mode == MODE_Z_BUFFER) {
+          set_object_flags(obj[0], FLTSHADING);
+          sort_mode = MODE_NO_SORT;
+        }
+        lock_keys |= JOYPAD_1;
+      }
+    }
 
     if(j_state->j1 & JOYPAD_RIGHT) {
       xpos += MOVE_SPEED;
