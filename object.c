@@ -69,17 +69,21 @@ void update_object(Object *obj, Matrix4 *mat, const Vector3 *light_p, const fixe
     if (intensity > FIXED_T(255))
       intensity = FIXED_T(255);
 
+#define NR (-1)
     obj->ply_list[i]->vertices[0].x = obj->proj_coords[obj->face_list[i].a].x << 16;
     obj->ply_list[i]->vertices[0].y = obj->proj_coords[obj->face_list[i].a].y << 16;
-    obj->ply_list[i]->vertices[0].z = obj->world_coords[obj->face_list[i].a].z << 16;
+    //obj->ply_list[i]->vertices[0].z = obj->world_coords[obj->face_list[i].a].z << 16;
+    obj->ply_list[i]->vertices[0].z = NR << 16;
 
     obj->ply_list[i]->vertices[1].x = obj->proj_coords[obj->face_list[i].b].x << 16;
     obj->ply_list[i]->vertices[1].y = obj->proj_coords[obj->face_list[i].b].y << 16;
-    obj->ply_list[i]->vertices[1].z = obj->world_coords[obj->face_list[i].b].z << 16;
+    //obj->ply_list[i]->vertices[1].z = obj->world_coords[obj->face_list[i].b].z << 16;
+    obj->ply_list[i]->vertices[1].z = NR << 16;
 
     obj->ply_list[i]->vertices[2].x = obj->proj_coords[obj->face_list[i].c].x << 16;
     obj->ply_list[i]->vertices[2].y = obj->proj_coords[obj->face_list[i].c].y << 16;
-    obj->ply_list[i]->vertices[2].z = obj->world_coords[obj->face_list[i].c].z << 16;
+    //obj->ply_list[i]->vertices[2].z = obj->world_coords[obj->face_list[i].c].z << 16;
+    obj->ply_list[i]->vertices[2].z = NR << 16;
 
     obj->ply_list[i]->param = (obj->face_list[i].color << 8) | (intensity >> PSHIFT)
 ; 

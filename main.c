@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
   screen *log = frame2;
   screen *tmp = phys;
 
-  clear_screen(frame1);
+  clear_zbuffered_screen(frame1);
 
   init_imath();
   init();
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
       render_polygon_list(phys, obj[ROOT_OBJECT]->render_list, CLR_SCREEN);
     }
     else if (sort_mode == MODE_Z_BUFFER) {
-      render_polygon_list(phys, obj[ROOT_OBJECT]->render_list, CLR_SCREEN | CLR_Z_SCREEN);
+      render_polygon_list(phys, obj[ROOT_OBJECT]->render_list, CLR_Z_SCREEN);
     }
     update();
     read_joypad_state(j_state);
