@@ -18,20 +18,20 @@
 #include "pyramid.h"
 
 #define ROOT_OBJECT 0
-#define OBJECT_SIZE  FLOAT_TO_FIXED(32.0)
+#define OBJECT_SIZE  FLOAT_TO_FIXED(128.0)
 
 #define AMBIENT_LIGHT FIXED_T(72)
 #define FACE_COLOR_1 0x00
 #define FACE_COLOR_2 0xf0
 
-#define MAXX     FIXED_T(HALFW)
-#define MINX     FIXED_T(-HALFW)
-#define MAXY     FIXED_T(HALFH)
-#define MINY     FIXED_T(-HALFH)
+#define MAXX     FIXED_T(1024)
+#define MINX     FIXED_T(-1024)
+#define MAXY     FIXED_T(1024)
+#define MINY     FIXED_T(-1024)
 #define MINZ     FIXED_T(OBJECT_MIN_Z)
-#define MAXZ     FIXED_T(256)
+#define MAXZ     FIXED_T(32768)
 
-#define MOVE_SPEED FLOAT_TO_FIXED(0.3)
+#define MOVE_SPEED FLOAT_TO_FIXED(3.0)
 
 #define MODE_NO_SORT     0
 #define MODE_Z_BUFFER    1
@@ -77,7 +77,7 @@ void update(void) {
 void init(void) {
   xpos = FIXED_T(0);
   ypos = FIXED_T(0);
-  zpos = FIXED_T(0);
+  zpos = FIXED_T(256);
   xangle = 0;
   yangle = 0;
   zangle = 0;

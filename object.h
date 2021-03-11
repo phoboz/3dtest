@@ -4,7 +4,7 @@
 #include <render.h>
 #include "imath.h"
 
-#define OBJECT_MIN_Z   -120
+#define OBJECT_MIN_Z   128
 
 #define OBJECT_DEFAULT_FLAGS FLTSHADING | ZBUFFERING
 
