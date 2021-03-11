@@ -28,7 +28,7 @@
 #define MINX     FIXED_T(-HALFW)
 #define MAXY     FIXED_T(HALFH)
 #define MINY     FIXED_T(-HALFH)
-#define MINZ     FIXED_T(-120)
+#define MINZ     FIXED_T(OBJECT_MIN_Z)
 #define MAXZ     FIXED_T(256)
 
 #define MOVE_SPEED FLOAT_TO_FIXED(0.3)
@@ -56,7 +56,8 @@ Matrix4 m_world;
 int sort_mode;
 
 void update(void) {
-  if (++xangle > MAX_ANGLE) {
+  xangle += 2;
+  if (xangle > MAX_ANGLE) {
     xangle = 0;
   }
 
@@ -124,7 +125,7 @@ int main(int argc, char *argv[]) {
   init_imath();
   init();
   lock_keys = 0;
-  sort_mode = MODE_NO_SORT;
+  sort_mode = MODE_Z_BUFFER;
 
   for(;;) {
     vsync();

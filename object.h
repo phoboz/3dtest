@@ -4,7 +4,9 @@
 #include <render.h>
 #include "imath.h"
 
-#define OBJECT_SHADING FLTSHADING
+#define OBJECT_MIN_Z   -120
+
+#define OBJECT_DEFAULT_FLAGS FLTSHADING | ZBUFFERING
 
 typedef struct {
   unsigned int a, b, c;
