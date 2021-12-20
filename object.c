@@ -5,6 +5,9 @@
 #include <render.h>
 
 #include "object.h"
+#include "data.h"
+
+extern screen *texture_scr;
 
 static polygon* new_triangle(polygon *next) {
   size_t sz = sizeof(polygon) + 3 * sizeof(vertex);
@@ -70,17 +73,25 @@ void update_object(Object *obj, Matrix4 *mat, const Vector3 *light_p, const fixe
       intensity = FIXED_T(255);
 
 #define NR (-1)
+    obj->ply_list[i]->texture = texture_scr;
+
     obj->ply_list[i]->vertices[0].x = obj->proj_coords[obj->face_list[i].a].x << 16;
     obj->ply_list[i]->vertices[0].y = obj->proj_coords[obj->face_list[i].a].y << 16;
     obj->ply_list[i]->vertices[0].z = (-OBJECT_MIN_Z - obj->world_coords[obj->face_list[i].a].z) << 16;
+    obj->ply_list[i]->vertices[0].u = 1 << 16;
+    obj->ply_list[i]->vertices[0].v = 1 << 16;
 
     obj->ply_list[i]->vertices[1].x = obj->proj_coords[obj->face_list[i].b].x << 16;
     obj->ply_list[i]->vertices[1].y = obj->proj_coords[obj->face_list[i].b].y << 16;
     obj->ply_list[i]->vertices[1].z = (-OBJECT_MIN_Z - obj->world_coords[obj->face_list[i].b].z) << 16;
+    obj->ply_list[i]->vertices[1].u = (TEXTURE_WIDTH - 1) << 16;
+    obj->ply_list[i]->vertices[1].v = 1 << 16;
 
     obj->ply_list[i]->vertices[2].x = obj->proj_coords[obj->face_list[i].c].x << 16;
     obj->ply_list[i]->vertices[2].y = obj->proj_coords[obj->face_list[i].c].y << 16;
     obj->ply_list[i]->vertices[2].z = (-OBJECT_MIN_Z - obj->world_coords[obj->face_list[i].c].z) << 16;
+    obj->ply_list[i]->vertices[2].u = (TEXTURE_WIDTH - 1) << 16;
+    obj->ply_list[i]->vertices[2].v = (TEXTURE_HEIGHT - 1) << 16;
 
     obj->ply_list[i]->param = (obj->face_list[i].color << 8) | (intensity >> PSHIFT)
 ; 

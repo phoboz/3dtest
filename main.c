@@ -16,6 +16,7 @@
 #include "imath.h"
 #include "object.h"
 #include "pyramid.h"
+#include "data.h"
 
 #define ROOT_OBJECT 0
 #define OBJECT_SIZE  FLOAT_TO_FIXED(128.0)
@@ -54,6 +55,8 @@ Matrix4 m_trans;
 Matrix4 m_world;
 
 int sort_mode;
+
+screen *texture_scr;
 
 void update(void) {
   xangle += 2;
@@ -102,6 +105,9 @@ int main(int argc, char *argv[]) {
   d->x = 32;
   d->y = 16;
 
+  texture_scr = new_screen();
+  set_simple_screen(DEPTH16, TEXTURE_WIDTH, TEXTURE_HEIGHT, texture_scr, &texture_gfx);
+
   screen *frame1 = new_screen();
   screen *frame2 = new_screen();
   phrase *frame_data = alloc_z_double_buffered_screens(DEPTH16,320,240,frame1,frame2);
@@ -125,6 +131,8 @@ int main(int argc, char *argv[]) {
   init_imath();
   init();
   lock_keys = 0;
+  set_object_flags(obj[0], FLTSHADING | TXTMAPPING | ZBUFFERING);
+  set_object_flags(obj[1], FLTSHADING | TXTMAPPING | ZBUFFERING);
   sort_mode = MODE_Z_BUFFER;
 
   for(;;) {
@@ -155,14 +163,14 @@ int main(int argc, char *argv[]) {
 
     if (j_state->j1 & JOYPAD_1) {
       if ((lock_keys & JOYPAD_1) == 0) {
-        if (sort_mode == MODE_NO_SORT) {
-          set_object_flags(obj[0], FLTSHADING | ZBUFFERING);
-          set_object_flags(obj[1], FLTSHADING | ZBUFFERING);
+        if (sort_mode == MODE_Z_BUFFER) {
+          set_object_flags(obj[0], FLTSHADING | TXTMAPPING | ZBUFFERING);
+          set_object_flags(obj[1], FLTSHADING | TXTMAPPING | ZBUFFERING);
           sort_mode = MODE_Z_BUFFER;
         }
-        else if (sort_mode == MODE_Z_BUFFER) {
-          set_object_flags(obj[0], FLTSHADING);
-          set_object_flags(obj[1], FLTSHADING);
+        else if (sort_mode == MODE_NO_SORT) {
+          set_object_flags(obj[0], FLTSHADING | TXTMAPPING);
+          set_object_flags(obj[1], FLTSHADING | TXTMAPPING);
           sort_mode = MODE_NO_SORT;
         }
         lock_keys |= JOYPAD_1;
